@@ -1,0 +1,18 @@
+name:               miso-vue-example
+version:            '0.1.0.0'
+synopsis:           GHCJS + Miso port of the Vue.js examples.
+category:           Web
+license:            BSD3
+
+dependencies:
+- base
+- miso
+
+executables:
+  svg-graph:
+    main:           Main.hs
+    source-dirs:    svg-graph
+    dependencies:
+    - aeson
+    - aeson-pretty
+    - containers
