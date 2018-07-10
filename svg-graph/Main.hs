@@ -76,7 +76,11 @@ updateModel AddStat model@(Model ss nid nlbl) =
         then noEff $ Model (ss ++ [Stat nid nlbl 100]) (nid + 1) ""
         else noEff model
 updateModel (DeleteStat sid) model@(Model ss _ _) =
-    noEff model { stats = filter (\s -> ident s /= sid) ss }
+    if length ss > 3
+        then noEff model { stats = filter (\s -> ident s /= sid) ss }
+        else model <# do
+            alert "Can't delete more!"
+            pure NoOp
 
 viewModel :: Model -> View Action
 viewModel model = div_ [] [
