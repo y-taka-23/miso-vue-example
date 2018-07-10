@@ -20,3 +20,8 @@ cabal.project.local
 cabal.project.local~
 .HTF/
 .ghc.environment.*
+miso-vue-example.cabal
+node_modules/
+**/*.js_hi
+**/*.js_o
+**/*.jsexe/

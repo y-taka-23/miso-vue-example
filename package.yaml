@@ -1,8 +1,12 @@
 name:               miso-vue-example
-version:            '0.1.0.0'
+version:            0.1.0.0
 synopsis:           GHCJS + Miso port of the Vue.js examples.
 category:           Web
+author:             TAKAHASHI Yuto <ytaka23dev@gmail.com>
+maintainer:         TAKAHASHI Yuto <ytaka23dev@gmail.com>
+copyright:          Copyright (C) 2018 TAKAHASHI Yuto
 license:            BSD3
+github:             y-taka-23/miso-vue-example
 
 dependencies:
 - base

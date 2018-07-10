@@ -2,9 +2,13 @@
   "name": "miso-vue-example",
   "version": "1.0.0",
   "description": "GHCJS + Miso port of the Vue.js examples.",
-  "main": "webpack-config.js",
-  "author": "",
+  "main": "webpack.config.js",
+  "author": "TAKAHASHI Yuto <ytaka23dev@gmail.com>",
   "license": "BSD-3-Clause",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/y-taka-23/miso-vue-example.git"
+  },
   "devDependencies": {
     "css-loader": "^1.0.0",
     "file-loader": "^1.1.11",
@@ -15,6 +19,6 @@
     "webpack-cli": "^3.0.8"
   },
   "scripts": {
-    "build": "webpack"
+    "build": "webpack --mode production"
   }
 }
