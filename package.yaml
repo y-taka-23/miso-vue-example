@@ -13,6 +13,14 @@ dependencies:
 - miso
 
 executables:
+
+  github-commits:
+    main:           Main.hs
+    source-dirs:    github-commits
+    dependencies:
+    - aeson
+    - ghcjs-base
+
   svg-graph:
     main:           Main.hs
     source-dirs:    svg-graph

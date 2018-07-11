@@ -34,6 +34,15 @@ var svgGraph = Object.assign({}, common, {
     }
 });
 
+var githubCommits = Object.assign({}, common, {
+    entry: './github-commits/index.js',
+    output: {
+        path: path.resolve(__dirname, 'docs/github-commits'),
+        filename: 'app.js'
+    }
+});
+
 module.exports = [
-    svgGraph
+    svgGraph,
+    githubCommits
 ];
