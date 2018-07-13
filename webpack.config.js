@@ -26,14 +26,6 @@ var common = {
     }
 };
 
-var svgGraph = Object.assign({}, common, {
-    entry: './svg-graph/index.js',
-    output: {
-        path: path.resolve(__dirname, 'docs/svg-graph'),
-        filename: 'app.js'
-    }
-});
-
 var githubCommits = Object.assign({}, common, {
     entry: './github-commits/index.js',
     output: {
@@ -42,7 +34,24 @@ var githubCommits = Object.assign({}, common, {
     }
 });
 
+var svgGraph = Object.assign({}, common, {
+    entry: './svg-graph/index.js',
+    output: {
+        path: path.resolve(__dirname, 'docs/svg-graph'),
+        filename: 'app.js'
+    }
+});
+
+var modalComponent = Object.assign({}, common, {
+    entry: './modal-component/index.js',
+    output: {
+        path: path.resolve(__dirname, 'docs/modal-component'),
+        filename: 'app.js'
+    }
+});
+
 module.exports = [
+    githubCommits,
     svgGraph,
-    githubCommits
+    modalComponent
 ];
