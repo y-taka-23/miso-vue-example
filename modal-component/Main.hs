@@ -3,7 +3,6 @@
 module Main where
 
 import           Miso
-import           Miso.String (MisoString)
 
 main :: IO ()
 main = do
@@ -32,7 +31,7 @@ data Action =
     | HideModal
 
 updateModel :: Action -> Model -> Effect Action Model
-updateModel NoOp model = noEff model
+updateModel NoOp model      = noEff model
 updateModel ShowModal model = noEff model { showModal = True }
 updateModel HideModal model = noEff model { showModal = False }
 
@@ -42,20 +41,20 @@ viewModel model = div_ [ id_ "app" ] $
         [ id_ "show-modal", onClick ShowModal ]
         [ text "Show Modal" ]
     ] ++
-   (if showModal model then [ attachShadow modalTemplate modal ] else [])
+    (if showModal model then [ modal ] else [])
 
-modalTemplate :: View Action
-modalTemplate = div_ [ class_ "modal-mask" ] [
+modal :: View Action
+modal = div_ [ class_ "modal-mask" ] [
       div_ [ class_ "modal-wrapper" ] [
           div_ [ class_ "modal-container" ] [
               div_ [ class_ "modal-header" ] [
-                  slot [ name_ "header" ] [ modal ]
+                  span_ [ id_ "header" ] [ h3_ [] [text "default header" ] ]
                 ]
             , div_ [ class_ "modal-body" ] [
-                  slot [ name_ "body" ] [ text "default body" ]
+                  span_ [ id_ "body" ] [ text "default body" ]
                 ]
             , div_ [ class_ "modal-footer" ] [
-                  slot [ name_ "footer" ] [
+                  span_ [ id_ "footer" ] [
                       text "default footer"
                     , button_
                         [ class_ "modal-default-button", onClick HideModal ]
@@ -65,18 +64,3 @@ modalTemplate = div_ [ class_ "modal-mask" ] [
             ]
         ]
     ]
-
-modal :: View Action
-modal = div_ [] [
-      h3_ [ slot_ "header" ] [ text "custom header" ]
-    ]
-
--- Todo: not implemented yet: shadowRoot.innerHTML
-attachShadow :: View action -> View action -> View action
-attachShadow shadow host = shadow
-
-slot :: [Attribute action] -> [View action] -> View action
-slot = nodeHtml "slot"
-
-slot_ :: MisoString -> Attribute action
-slot_ = textProp "slot"
