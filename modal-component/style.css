@@ -36,3 +36,29 @@
 .modal-default-button {
   float: right;
 }
+
+.modal-enter {
+    opacity: 0;
+}
+
+.modal-enter-active {
+    transition: all .3s ease;
+}
+
+.modal-leave-active {
+    opacity: 0;
+    transition: all .3s ease;
+}
+
+.modal-enter .modal-container {
+    transform: scale(1.1);
+}
+
+.modal-enter-active .modal-container {
+    transition: all .3s ease;
+}
+
+.modal-leave-active .modal-container {
+    transform: scale(1.1);
+    transition: all .3s ease;
+}
