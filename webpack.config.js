@@ -34,6 +34,14 @@ var githubCommits = Object.assign({}, common, {
     }
 });
 
+var gridComponent = Object.assign({}, common, {
+    entry: './grid-component/index.js',
+    output: {
+        path: path.resolve(__dirname, 'docs/grid-component'),
+        filename: 'app.js'
+    }
+});
+
 var svgGraph = Object.assign({}, common, {
     entry: './svg-graph/index.js',
     output: {
@@ -52,6 +60,7 @@ var modalComponent = Object.assign({}, common, {
 
 module.exports = [
     githubCommits,
+    gridComponent,
     svgGraph,
     modalComponent
 ];
