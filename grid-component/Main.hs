@@ -108,6 +108,7 @@ viewModel model = div_ [ id_ "demo" ] [
         fs = sortFighter mActiveKey orders $
             filterFighter (query model) (gridData model)
 
+-- Todo: generalize the grid table for more general data types
 gridTable :: Maybe SortKey -> OrderSet -> [Fighter] -> View Action
 gridTable mActiveKey orders fs = table_ [] [
       thead_ [] [ gridHeaders mActiveKey orders ]
