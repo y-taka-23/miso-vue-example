@@ -26,41 +26,17 @@ var common = {
     }
 };
 
-var githubCommits = Object.assign({}, common, {
-    entry: './github-commits/index.js',
+const exampleOf = (name) => Object.assign({}, common, {
+    entry: path.join(__dirname, name, 'index.js'),
     output: {
-        path: path.resolve(__dirname, 'docs/github-commits'),
-        filename: 'app.js'
-    }
-});
-
-var gridComponent = Object.assign({}, common, {
-    entry: './grid-component/index.js',
-    output: {
-        path: path.resolve(__dirname, 'docs/grid-component'),
-        filename: 'app.js'
-    }
-});
-
-var svgGraph = Object.assign({}, common, {
-    entry: './svg-graph/index.js',
-    output: {
-        path: path.resolve(__dirname, 'docs/svg-graph'),
-        filename: 'app.js'
-    }
-});
-
-var modalComponent = Object.assign({}, common, {
-    entry: './modal-component/index.js',
-    output: {
-        path: path.resolve(__dirname, 'docs/modal-component'),
+        path: path.resolve(path.join(__dirname, 'docs', name)),
         filename: 'app.js'
     }
 });
 
 module.exports = [
-    githubCommits,
-    gridComponent,
-    svgGraph,
-    modalComponent
+    exampleOf('github-commits'),
+    exampleOf('grid-component'),
+    exampleOf('svg-graph'),
+    exampleOf('modal-component'),
 ];
