@@ -18,11 +18,14 @@ main = do
     , mountPoint = Nothing
     }
 
-data Model = Model
-    deriving (Eq, Show)
+data Model = Model {
+      controlPoint :: (Int, Int)
+    } deriving (Eq, Show)
 
 initialModel :: Model
-initialModel = Model
+initialModel = Model {
+      controlPoint = (160, 160)
+    }
 
 data Action =
       NoOp
@@ -32,14 +35,34 @@ updateModel NoOp model = noEff model
 
 viewModel :: Model -> View Action
 viewModel model = div_ [ id_ "app" ] [
-      div_ [ class_ "draggable-header-view" ] [
-          Svg.svg_ [ class_ "bg" ] []
+      div_ [
+          class_ "draggable-header-view"
+        ] [
+          Svg.svg_ [
+              class_ "bg"
+            , Svg.width_ "320"
+            , Svg.height_ "560"
+            ] [
+              Svg.path_ [
+                  Svg.d_ . ms $ headerBezier (controlPoint model)
+                , Svg.fill_ "#614e83"
+                ] []
+            ]
         , div_ [ class_ "header" ] [
               h1_ [] [ text "Elastic Draggable SVG Header" ]
             , subheader
             ]
         , div_ [ class_ "content" ] [ content ]
         ]
+    ]
+
+headerBezier :: (Int, Int) -> String
+headerBezier (x, y) = unlines $ [
+      "M 0,0"
+    , "L 320,0"
+    , "320, 160"
+    , "Q " ++ show x ++ "," ++ show y
+    , "0,160"
     ]
 
 subheader :: View action
