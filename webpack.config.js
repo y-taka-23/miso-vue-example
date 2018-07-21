@@ -39,4 +39,5 @@ module.exports = [
     exampleOf('grid-component'),
     exampleOf('svg-graph'),
     exampleOf('modal-component'),
+    exampleOf('elastic-header'),
 ];
