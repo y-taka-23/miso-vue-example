@@ -14,25 +14,29 @@ main = do
     , model = initialModel
     , update = updateModel
     , view = viewModel
-    , subs = []
+    , subs = [ mouseSub SetCurrentPoint ]
     , events = defaultEvents
     , mountPoint = Nothing
     }
 
 data Model = Model {
-      controlPoint :: (Int, Int)
+      currentPoint :: (Int, Int)
     } deriving (Eq, Show)
 
 initialModel :: Model
 initialModel = Model {
-      controlPoint = (160, 160)
+      currentPoint = (0, 0)
     }
 
 data Action =
       NoOp
+    | SetCurrentPoint (Int, Int)
 
 updateModel :: Action -> Model -> Effect Action Model
-updateModel NoOp model = noEff model
+updateModel NoOp model =
+    noEff model
+updateModel (SetCurrentPoint p) model =
+    noEff model { currentPoint = p }
 
 viewModel :: Model -> View Action
 viewModel model = div_ [ id_ "app" ] [
@@ -59,6 +63,9 @@ viewModel model = div_ [ id_ "app" ] [
             ] [ content ]
         ]
     ]
+
+controlPoint :: Model -> (Int, Int)
+controlPoint model = (160, 160)
 
 headerBezier :: (Int, Int) -> String
 headerBezier (x, y) = unlines $ [
