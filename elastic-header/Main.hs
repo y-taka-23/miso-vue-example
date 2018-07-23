@@ -2,6 +2,7 @@
 
 module Main where
 
+import qualified Data.Map    as M
 import           Miso
 import           Miso.String (ms)
 import qualified Miso.Svg    as Svg
@@ -52,7 +53,10 @@ viewModel model = div_ [ id_ "app" ] [
               h1_ [] [ text "Elastic Draggable SVG Header" ]
             , subheader
             ]
-        , div_ [ class_ "content" ] [ content ]
+        , div_ [
+              class_ "content"
+            , contentPosition (controlPoint model)
+            ] [ content ]
         ]
     ]
 
@@ -72,6 +76,13 @@ subheader = p_ [] [
     , text " + "
     , a_ [ href_ "http://dynamicsjs.com" ] [ text "dynamics.js" ]
     ]
+
+contentPosition :: (Int, Int) -> Attribute action
+contentPosition (_, y) = style_ $ M.fromList [("transform", ms translate)]
+    where
+        dy = fromIntegral $ y - 160
+        dampen = if dy > 0 then 2 else 4
+        translate = "translate3d(0, " ++ show (dy / dampen) ++ "px, 0)"
 
 content :: View action
 content = p_ [] [
