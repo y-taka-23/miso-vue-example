@@ -21,27 +21,37 @@ main = do
 
 data Model = Model {
       currentPoint :: (Int, Int)
+    , startPoint   :: Maybe (Int, Int)
     } deriving (Eq, Show)
 
 initialModel :: Model
 initialModel = Model {
       currentPoint = (0, 0)
+    , startPoint   = Nothing
     }
 
 data Action =
       NoOp
     | SetCurrentPoint (Int, Int)
+    | StartDrag
+    | StopDrag
 
 updateModel :: Action -> Model -> Effect Action Model
 updateModel NoOp model =
     noEff model
 updateModel (SetCurrentPoint p) model =
     noEff model { currentPoint = p }
+updateModel StartDrag model =
+    noEff model { startPoint = Just (currentPoint model) }
+updateModel StopDrag model =
+    noEff model { startPoint = Nothing }
 
 viewModel :: Model -> View Action
 viewModel model = div_ [ id_ "app" ] [
       div_ [
           class_ "draggable-header-view"
+        , onMouseDown StartDrag
+        , onMouseUp   StopDrag
         ] [
           Svg.svg_ [
               class_ "bg"
@@ -65,7 +75,14 @@ viewModel model = div_ [ id_ "app" ] [
     ]
 
 controlPoint :: Model -> (Int, Int)
-controlPoint model = (160, 160)
+controlPoint model = case startPoint model of
+    Nothing -> (160, 160)
+    Just p  -> (160 + (toX - fromX), 160 + floor (dy / dampen))
+        where
+            (fromX, fromY) = p
+            (toX, toY) = currentPoint model
+            dy = fromIntegral (toY - fromY)
+            dampen = if dy > 0 then 1.5 else 4
 
 headerBezier :: (Int, Int) -> String
 headerBezier (x, y) = unlines $ [
