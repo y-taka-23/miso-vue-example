@@ -37,7 +37,9 @@ const exampleOf = (name) => Object.assign({}, common, {
 module.exports = [
     exampleOf('github-commits'),
     exampleOf('grid-component'),
+    exampleOf('tree-view'),
     exampleOf('svg-graph'),
     exampleOf('modal-component'),
+    exampleOf('elastic-header'),
     exampleOf('elastic-header'),
 ];
