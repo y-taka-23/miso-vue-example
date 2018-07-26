@@ -17,11 +17,31 @@ main = do
     , mountPoint = Nothing
     }
 
-data Model = Model
-     deriving (Eq, Show)
+type Model = Object
+
+data Object =
+      File   String
+    | Folder String Bool [Object]
+    deriving (Eq, Show)
 
 initialModel :: Model
-initialModel = Model
+initialModel =
+    Folder "My Tree" False [
+          File "hello"
+        , File "wat"
+        , Folder "child folder" False [
+              Folder "child folder" False [
+                  File "hello"
+                , File "wat"
+                ]
+            , File "hello"
+            , File "wat"
+            , Folder "child folder" False [
+                  File "hello"
+                , File "wat"
+                ]
+            ]
+        ]
 
 data Action =
       NoOp
