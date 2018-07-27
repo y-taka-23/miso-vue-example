@@ -17,11 +17,11 @@ main = do
     , mountPoint = Nothing
     }
 
-type Model = Object
+type Model = Item
 
-data Object =
+data Item =
       File   String
-    | Folder String Bool [Object]
+    | Folder String Bool [Item]
     deriving (Eq, Show)
 
 initialModel :: Model
