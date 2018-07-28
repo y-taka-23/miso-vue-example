@@ -1,9 +1,9 @@
-{-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Main where
 
 import           Miso
+import           Miso.String (ms)
 
 main :: IO ()
 main = do
@@ -51,4 +51,27 @@ updateModel NoOp model =
     noEff model
 
 viewModel :: Model -> View Action
-viewModel model = div_ [] [ text "Tree View Example"]
+viewModel model = div_ [] [
+      p_ [] [
+          text "(You can double click on an item to turn it into a folder.)"
+        ]
+    , ul_ [ id_ "demo" ] [ viewItem model ]
+    ]
+
+viewItem :: Item -> View Action
+viewItem (File name) =
+    li_ [ class_ "item" ] [
+          div_ [] [
+              text . ms $ name
+            ]
+        ]
+viewItem (Folder name open children) =
+    li_ [ class_ "item" ] [
+          div_ [ class_ "bold" ] [
+              text . ms $ name
+            , span_ [] [ text $ if open then "-" else "+" ]
+            ]
+        , ul_ [] $
+            map viewItem children ++
+            [ li_ [ class_ "add" ] [ text "+" ] ]
+        ]
