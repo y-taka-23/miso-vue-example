@@ -44,7 +44,12 @@ initialModel =
         ]
 
 data Action =
-      NoOp
+        NoOp
+      | Here  Operation
+      | Where Int Action
+
+data Operation =
+      Toggle
 
 updateModel :: Action -> Model -> Effect Action Model
 updateModel NoOp model =
@@ -55,23 +60,22 @@ viewModel model = div_ [] [
       p_ [] [
           text "(You can double click on an item to turn it into a folder.)"
         ]
-    , ul_ [ id_ "demo" ] [ viewItem model ]
+    , ul_ [ id_ "demo" ] [ viewItem Here model ]
     ]
 
-viewItem :: Item -> View Action
-viewItem (File name) =
+viewItem :: (Operation -> Action) -> Item -> View Action
+viewItem _ (File name) =
+    li_ [ class_ "item" ] [ div_ [] [ text . ms $ name ] ]
+viewItem this (Folder name open children) =
     li_ [ class_ "item" ] [
-          div_ [] [
-              text . ms $ name
-            ]
-        ]
-viewItem (Folder name open children) =
-    li_ [ class_ "item" ] [
-          div_ [ class_ "bold" ] [
+          div_ [ class_ "bold", onClick (this Toggle) ] [
               text . ms $ name
             , span_ [] [ text $ if open then "-" else "+" ]
             ]
         , ul_ [] $
-            map viewItem children ++
+            zipWith (\n i -> viewItem (n `of_` this) i) [0..] children ++
             [ li_ [ class_ "add" ] [ text "+" ] ]
         ]
+
+of_ :: Int -> (Operation -> Action) -> (Operation -> Action)
+of_ n this = Where n . this
