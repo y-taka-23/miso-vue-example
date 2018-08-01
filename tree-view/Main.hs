@@ -69,8 +69,8 @@ viewItem _ (File name) =
 viewItem this (Folder name open children) =
     li_ [ class_ "item" ] [
           div_ [ class_ "bold", onClick (this Toggle) ] [
-              text . ms $ name
-            , span_ [] [ text $ if open then "-" else "+" ]
+              text . ms $ name ++ " "
+            , span_ [] [ text $ if open then "[-]" else "[+]" ]
             ]
         , ul_ [] $
             zipWith (\n i -> viewItem (n `of_` this) i) [0..] children ++
