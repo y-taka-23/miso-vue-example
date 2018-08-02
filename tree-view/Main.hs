@@ -51,6 +51,7 @@ data Action =
 
 data Operation =
       Toggle
+    | ChangeType
     deriving (Eq, Show)
 
 updateModel :: Action -> Model -> Effect Action Model
@@ -62,8 +63,10 @@ updateItem (Here op) item     = operateItem op item
 updateItem (Where n act) item = updateChild n act item
 
 operateItem :: Operation -> Item -> Item
-operateItem Toggle file@(File _)               = file
+operateItem Toggle file@(File _) = file
 operateItem Toggle (Folder name open children) = Folder name (not open) children
+operateItem ChangeType (File name) = Folder name True [ File "new stuff" ]
+operateItem ChangeType folder@(Folder _ _ _) = folder
 
 updateChild :: Int -> Action -> Item -> Item
 updateChild n act file@(File _) = file
@@ -84,8 +87,10 @@ viewModel model = div_ [] [
     ]
 
 viewItem :: (Operation -> Action) -> Item -> View Action
-viewItem _ (File name) =
-    li_ [ class_ "item" ] [ div_ [] [ text . ms $ name ] ]
+viewItem this (File name) =
+    li_ [ class_ "item" ] [
+          div_ [ onDoubleClick (this ChangeType) ] [ text . ms $ name ]
+        ]
 viewItem this (Folder name open children) =
     li_ [ class_ "item" ] $ [
           div_ [ class_ "bold", onClick (this Toggle) ] [
