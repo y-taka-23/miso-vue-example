@@ -44,16 +44,36 @@ initialModel =
         ]
 
 data Action =
-        NoOp
-      | Here  Operation
-      | Where Int Action
+      NoOp
+    | Here  Operation
+    | Where Int Action
+    deriving (Eq, Show)
 
 data Operation =
       Toggle
+    deriving (Eq, Show)
 
 updateModel :: Action -> Model -> Effect Action Model
-updateModel NoOp model =
-    noEff model
+updateModel NoOp model = noEff model
+updateModel act  model = noEff $ updateItem act model
+
+updateItem :: Action -> Item -> Item
+updateItem (Here op) item     = operateItem op item
+updateItem (Where n act) item = updateChild n act item
+
+operateItem :: Operation -> Item -> Item
+operateItem Toggle file@(File _)               = file
+operateItem Toggle (Folder name open children) = Folder name (not open) children
+
+updateChild :: Int -> Action -> Item -> Item
+updateChild n act file@(File _) = file
+updateChild n act (Folder name open children) =
+    Folder name open $ modifyAt n (updateItem act) children
+
+modifyAt :: Int -> (a -> a) -> [a] -> [a]
+modifyAt _ _ []       = []
+modifyAt 0 f (x : xs) = f x : xs
+modifyAt n f (x : xs) = x : modifyAt (n - 1) f xs
 
 viewModel :: Model -> View Action
 viewModel model = div_ [] [
@@ -67,15 +87,20 @@ viewItem :: (Operation -> Action) -> Item -> View Action
 viewItem _ (File name) =
     li_ [ class_ "item" ] [ div_ [] [ text . ms $ name ] ]
 viewItem this (Folder name open children) =
-    li_ [ class_ "item" ] [
+    li_ [ class_ "item" ] $ [
           div_ [ class_ "bold", onClick (this Toggle) ] [
               text . ms $ name ++ " "
             , span_ [] [ text $ if open then "[-]" else "[+]" ]
             ]
-        , ul_ [] $
-            zipWith (\n i -> viewItem (n `of_` this) i) [0..] children ++
-            [ li_ [ class_ "add" ] [ text "+" ] ]
-        ]
+        ] ++ if open then [ viewChildren ] else []
+        where
+            viewChildren = ul_ [] $
+                zipWith (\n i -> viewItem (n `of_` this) i) [0..] children
+                ++ [ li_ [ class_ "add" ] [ text "+" ] ]
 
 of_ :: Int -> (Operation -> Action) -> (Operation -> Action)
-of_ n this = Where n . this
+of_ n this = insert n . this
+
+insert :: Int -> Action -> Action
+insert n (Here op)     = Where n (Here op)
+insert n (Where m act) = Where m (insert n act)
