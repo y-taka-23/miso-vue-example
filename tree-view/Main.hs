@@ -52,6 +52,7 @@ data Action =
 data Operation =
       Toggle
     | ChangeType
+    | AddChild
     deriving (Eq, Show)
 
 updateModel :: Action -> Model -> Effect Action Model
@@ -67,6 +68,9 @@ operateItem Toggle file@(File _) = file
 operateItem Toggle (Folder name open children) = Folder name (not open) children
 operateItem ChangeType (File name) = Folder name True [ File "new stuff" ]
 operateItem ChangeType folder@(Folder _ _ _) = folder
+operateItem AddChild file@(File _) = file
+operateItem AddChild (Folder name open children) =
+    Folder name open $ children ++ [ File "new stuff" ]
 
 updateChild :: Int -> Action -> Item -> Item
 updateChild n act file@(File _) = file
@@ -100,8 +104,8 @@ viewItem this (Folder name open children) =
         ] ++ if open then [ viewChildren ] else []
         where
             viewChildren = ul_ [] $
-                zipWith (\n i -> viewItem (n `of_` this) i) [0..] children
-                ++ [ li_ [ class_ "add" ] [ text "+" ] ]
+                zipWith (\n i -> viewItem (n `of_` this) i) [0..] children ++
+                [ li_ [ class_ "add", onClick (this AddChild) ] [ text "+" ] ]
 
 of_ :: Int -> (Operation -> Action) -> (Operation -> Action)
 of_ n this = insert n . this
