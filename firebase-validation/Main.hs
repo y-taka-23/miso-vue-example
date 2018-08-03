@@ -4,7 +4,7 @@ module Main where
 
 import           Data.List   (intersperse)
 import           Miso
-import           Miso.String (ms)
+import           Miso.String (fromMisoString, ms)
 
 main :: IO ()
 main = do
@@ -19,8 +19,9 @@ main = do
     }
 
 data Model = Model {
-      users   :: [User]
-    , newUser :: User
+      users    :: [User]
+    , newName  :: String
+    , newEmail :: String
     } deriving (Eq, Show)
 
 data User = User {
@@ -35,30 +36,57 @@ initialModel = Model {
         , User "Bob"   "bob@example.com"
         , User "Carol" "carol@example.com"
         ]
-    , newUser = User "" ""
+    , newName = ""
+    , newEmail = ""
     }
 
 data Action =
       NoOp
+    | SetNewName String
+    | SetNewEmail String
+    | AddUser
+    | RemoveUser Int
 
 updateModel :: Action -> Model -> Effect Action Model
 updateModel NoOp model = noEff model
+updateModel (SetNewName name) model = noEff model { newName = name }
+updateModel (SetNewEmail email) model = noEff model { newEmail = email }
+updateModel AddUser model =
+    let user = User (newName model) (newEmail model)
+    in noEff model {
+          users = users model ++ [user]
+        , newName = ""
+        , newEmail = ""
+        }
+updateModel (RemoveUser n) model =
+    noEff model { users = removeAt n (users model) }
+
+removeAt :: Int -> [a] -> [a]
+removeAt _ [] = []
+removeAt 0 (_ : xs) = xs
+removeAt n (x : xs) = x : removeAt (n - 1) xs
 
 viewModel :: Model -> View Action
 viewModel model = div_ [ id_ "app" ] [
-      ul_ [] $ map viewUser (users model)
+      ul_ [] $ zipWith viewUser [0..] (users model)
     , div_ [ id_ "form" ] $ intersperse (text " ") [
           input_ [
               type_ "text"
-            , value_ . ms . name . newUser $ model
+            , onInput (SetNewName . fromMisoString)
+            , value_ . ms . newName $ model
             , placeholder_ "Username"
             ]
         , input_ [
               type_ "email"
-            , value_ . ms . email . newUser $ model
+            , onInput (SetNewEmail . fromMisoString)
+            , value_ . ms . newEmail $ model
             , placeholder_ "email@email.com"
             ]
-        , input_ [ type_ "submit", value_ "Add User" ]
+        , input_ [
+              type_ "submit"
+            , onClick AddUser
+            , value_ "Add User"
+            ]
         ]
     , ul_ [ class_ "errors" ] [
           li_ [] [ text "Name cannot be empty." ]
@@ -66,8 +94,8 @@ viewModel model = div_ [ id_ "app" ] [
         ]
     ]
 
-viewUser :: User -> View Action
-viewUser user = li_ [ class_ "user" ] [
+viewUser :: Int -> User -> View Action
+viewUser n user = li_ [ class_ "user" ] [
       span_ [] [ text . ms $ name user ++ " - " ++ email user ++ " " ]
-    , button_ [] [ text "X" ]
+    , button_ [ onClick (RemoveUser n) ] [ text "X" ]
     ]
