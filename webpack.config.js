@@ -41,5 +41,5 @@ module.exports = [
     exampleOf('svg-graph'),
     exampleOf('modal-component'),
     exampleOf('elastic-header'),
-    exampleOf('elastic-header'),
+    exampleOf('firebase-validation'),
 ];
