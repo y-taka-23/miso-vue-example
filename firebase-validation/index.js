@@ -1,5 +1,5 @@
 require('./index.html');
-//require('./style.css');
+require('./style.css');
 
 const Main = require('./Main.hs');
 

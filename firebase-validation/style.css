@@ -1,0 +1,23 @@
+body {
+    font-family: Helvetica, Arial, sans-serif;
+}
+
+ul {
+    padding: 0;
+}
+
+.user {
+    height: 30px;
+    line-height: 30px;
+    padding: 10px;
+    border-top: 1px solid #eee;
+    overflow: hidden;
+}
+
+.user:last-child {
+    border-bottom: 1px solid #eee;
+}
+
+.errors {
+    color: #f00;
+}
