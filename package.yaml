@@ -11,6 +11,7 @@ github:             y-taka-23/miso-vue-example
 dependencies:
 - base
 - miso
+- split
 
 executables:
 

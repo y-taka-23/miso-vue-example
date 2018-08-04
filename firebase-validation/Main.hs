@@ -2,9 +2,11 @@
 
 module Main where
 
-import           Data.List   (intersperse)
+import           Data.Char       (isSpace)
+import           Data.List       (intersperse)
+import           Data.List.Split (splitOn)
 import           Miso
-import           Miso.String (fromMisoString, ms)
+import           Miso.String     (fromMisoString, ms)
 
 main :: IO ()
 main = do
@@ -82,20 +84,36 @@ viewModel model = div_ [ id_ "app" ] [
             , value_ . ms . newEmail $ model
             , placeholder_ "email@email.com"
             ]
-        , input_ [
+        , input_ $ [
               type_ "submit"
-            , onClick AddUser
             , value_ "Add User"
-            ]
+            ] ++ if valid then [ onClick AddUser ] else []
         ]
-    , ul_ [ class_ "errors" ] [
-          li_ [] [ text "Name cannot be empty." ]
-        , li_ [] [ text "Please provide a valid email address." ]
-        ]
+    , ul_ [ class_ "errors" ] $ nameError ++ emailError
     ]
+    where
+        valid = nameValid && emailValid
+        nameValid = validName $ newName model
+        emailValid = validEmail $ newEmail model
+        nameError = if not nameValid
+            then [ li_ [] [ text "Name cannot be empty." ] ]
+            else []
+        emailError = if not emailValid
+            then [ li_ [] [ text "Please provide a valid email address." ] ]
+            else []
 
 viewUser :: Int -> User -> View Action
 viewUser n user = li_ [ class_ "user" ] [
       span_ [] [ text . ms $ name user ++ " - " ++ email user ++ " " ]
     , button_ [ onClick (RemoveUser n) ] [ text "X" ]
     ]
+
+validName :: String -> Bool
+validName = not . all isSpace
+
+-- Todo: regex-posix library doesn't work in GHCJS
+validEmail :: String -> Bool
+validEmail email = length strs == 2 && all noSpace strs
+    where
+        strs = splitOn "@" email
+        noSpace str = not (null str) && not (any isSpace str)
