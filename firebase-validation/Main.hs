@@ -21,10 +21,13 @@ main = do
     }
 
 data Model = Model {
-      users    :: [User]
+      users    :: [(UserIndex, User)]
     , newName  :: String
     , newEmail :: String
+    , newIndex :: UserIndex
     } deriving (Eq, Show)
+
+type UserIndex = Int
 
 data User = User {
       name  :: String
@@ -34,12 +37,13 @@ data User = User {
 initialModel :: Model
 initialModel = Model {
       users = [
-          User "Alice" "alice@example.com"
-        , User "Bob"   "bob@example.com"
-        , User "Carol" "carol@example.com"
+          (0, User "Alice" "alice@example.com")
+        , (1, User "Bob"   "bob@example.com")
+        , (2, User "Carol" "carol@example.com")
         ]
     , newName = ""
     , newEmail = ""
+    , newIndex = 3
     }
 
 data Action =
@@ -47,30 +51,26 @@ data Action =
     | SetNewName String
     | SetNewEmail String
     | AddUser
-    | RemoveUser Int
+    | RemoveUser UserIndex
 
 updateModel :: Action -> Model -> Effect Action Model
 updateModel NoOp model = noEff model
 updateModel (SetNewName name) model = noEff model { newName = name }
 updateModel (SetNewEmail email) model = noEff model { newEmail = email }
 updateModel AddUser model =
-    let user = User (newName model) (newEmail model)
+    let user = (newIndex model, User (newName model) (newEmail model))
     in noEff model {
           users = users model ++ [user]
         , newName = ""
         , newEmail = ""
+        , newIndex = newIndex model + 1
         }
-updateModel (RemoveUser n) model =
-    noEff model { users = removeAt n (users model) }
-
-removeAt :: Int -> [a] -> [a]
-removeAt _ [] = []
-removeAt 0 (_ : xs) = xs
-removeAt n (x : xs) = x : removeAt (n - 1) xs
+updateModel (RemoveUser ix) model =
+    noEff model { users = filter ((/= ix) . fst) (users model) }
 
 viewModel :: Model -> View Action
 viewModel model = div_ [ id_ "app" ] [
-      ul_ [] $ zipWith viewUser [0..] (users model)
+      ul_ [] $ map viewUser (users model)
     , div_ [ id_ "form" ] $ intersperse (text " ") [
           input_ [
               type_ "text"
@@ -102,10 +102,10 @@ viewModel model = div_ [ id_ "app" ] [
             then [ li_ [] [ text "Please provide a valid email address." ] ]
             else []
 
-viewUser :: Int -> User -> View Action
-viewUser n user = li_ [ class_ "user" ] [
+viewUser :: (UserIndex, User) -> View Action
+viewUser (ix, user) = li_ [ class_ "user" ] [
       span_ [] [ text . ms $ name user ++ " - " ++ email user ++ " " ]
-    , button_ [ onClick (RemoveUser n) ] [ text "X" ]
+    , button_ [ onClick (RemoveUser ix) ] [ text "X" ]
     ]
 
 validName :: String -> Bool
