@@ -7,9 +7,11 @@ import           Data.List       (intersperse)
 import           Data.List.Split (splitOn)
 import           Miso
 import           Miso.String     (fromMisoString, ms)
+import           RealtimeDB      (User (..), UserKey, initializeFirebase)
 
 main :: IO ()
 main = do
+    initializeFirebase
     startApp App {
       initialAction = NoOp
     , model = initialModel
@@ -21,52 +23,38 @@ main = do
     }
 
 data Model = Model {
-      users    :: [(UserIndex, User)]
+      users    :: [(UserKey, User)]
     , newName  :: String
     , newEmail :: String
-    , newIndex :: UserIndex
-    } deriving (Eq, Show)
-
-type UserIndex = Int
-
-data User = User {
-      name  :: String
-    , email :: String
     } deriving (Eq, Show)
 
 initialModel :: Model
 initialModel = Model {
-      users = [
-          (0, User "Alice" "alice@example.com")
-        , (1, User "Bob"   "bob@example.com")
-        , (2, User "Carol" "carol@example.com")
-        ]
+      users = []
     , newName = ""
     , newEmail = ""
-    , newIndex = 3
     }
 
 data Action =
       NoOp
     | SetNewName String
     | SetNewEmail String
-    | AddUser
-    | RemoveUser UserIndex
+    | PushUser
+    | RemoveUser UserKey
 
 updateModel :: Action -> Model -> Effect Action Model
 updateModel NoOp model = noEff model
 updateModel (SetNewName name) model = noEff model { newName = name }
 updateModel (SetNewEmail email) model = noEff model { newEmail = email }
-updateModel AddUser model =
-    let user = (newIndex model, User (newName model) (newEmail model))
+updateModel PushUser model =
+    let user = ("", User (newName model) (newEmail model))
     in noEff model {
           users = users model ++ [user]
         , newName = ""
         , newEmail = ""
-        , newIndex = newIndex model + 1
         }
-updateModel (RemoveUser ix) model =
-    noEff model { users = filter ((/= ix) . fst) (users model) }
+updateModel (RemoveUser key) model =
+    noEff model { users = filter ((/= key) . fst) (users model) }
 
 viewModel :: Model -> View Action
 viewModel model = div_ [ id_ "app" ] [
@@ -87,7 +75,7 @@ viewModel model = div_ [ id_ "app" ] [
         , input_ $ [
               type_ "submit"
             , value_ "Add User"
-            ] ++ if valid then [ onClick AddUser ] else []
+            ] ++ if valid then [ onClick PushUser ] else []
         ]
     , ul_ [ class_ "errors" ] $ nameError ++ emailError
     ]
@@ -102,10 +90,10 @@ viewModel model = div_ [ id_ "app" ] [
             then [ li_ [] [ text "Please provide a valid email address." ] ]
             else []
 
-viewUser :: (UserIndex, User) -> View Action
-viewUser (ix, user) = li_ [ class_ "user" ] [
+viewUser :: (UserKey, User) -> View Action
+viewUser (key, user) = li_ [ class_ "user" ] [
       span_ [] [ text . ms $ name user ++ " - " ++ email user ++ " " ]
-    , button_ [ onClick (RemoveUser ix) ] [ text "X" ]
+    , button_ [ onClick (RemoveUser key) ] [ text "X" ]
     ]
 
 validName :: String -> Bool

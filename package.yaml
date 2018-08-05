@@ -12,6 +12,7 @@ dependencies:
 - base
 - miso
 - split
+- jsaddle
 
 executables:
 
