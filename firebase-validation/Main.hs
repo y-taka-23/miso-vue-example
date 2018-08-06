@@ -7,11 +7,13 @@ import           Data.List       (intersperse)
 import           Data.List.Split (splitOn)
 import           Miso
 import           Miso.String     (fromMisoString, ms)
-import           RealtimeDB      (User (..), UserKey, initializeFirebase)
+import           RealtimeDB      (User (..), UserKey, getUsersRef,
+                                  initializeFirebase)
 
 main :: IO ()
 main = do
     initializeFirebase
+    ref <- getUsersRef
     startApp App {
       initialAction = NoOp
     , model = initialModel
