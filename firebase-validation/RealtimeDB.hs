@@ -3,7 +3,7 @@
 module RealtimeDB (
       initializeFirebase
     , getUsersRef
---    , pushUser
+    , pushUser
     , DBRef
     , User(..)
     , UserKey
@@ -13,8 +13,8 @@ import           Control.Lens                ((^.))
 import qualified Data.Text                   as T
 import           GHC.Generics                (Generic)
 import           GHCJS.Types                 (JSVal)
-import           Language.Javascript.JSaddle (ToJSVal, js0, js1, jsg,
-                                              runJSaddle, val)
+import           Language.Javascript.JSaddle (ToJSVal, js, js0, js1, jsg,
+                                              runJSaddle, val, valToText)
 
 data FirebaseConfig = FirebaseConfig {
       apiKey      :: String
@@ -43,9 +43,17 @@ data User = User {
     , email :: String
     } deriving (Eq, Show, Generic)
 
+instance ToJSVal User
+
 type DBRef = JSVal
 
 getUsersRef :: IO DBRef
 getUsersRef = runJSaddle () $ do
     ref <- jsg "firebase" ^. js0 "database" ^. js1 "ref" (val "/users")
     return ref
+
+pushUser :: DBRef -> User -> IO UserKey
+pushUser ref user = runJSaddle () $ do
+    res <- ref ^. js1 "push" (val user)
+    key <- valToText =<< res ^. js "key"
+    return key

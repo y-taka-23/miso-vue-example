@@ -7,8 +7,8 @@ import           Data.List       (intersperse)
 import           Data.List.Split (splitOn)
 import           Miso
 import           Miso.String     (fromMisoString, ms)
-import           RealtimeDB      (User (..), UserKey, getUsersRef,
-                                  initializeFirebase)
+import           RealtimeDB      (DBRef, User (..), UserKey, getUsersRef,
+                                  initializeFirebase, pushUser)
 
 main :: IO ()
 main = do
@@ -17,7 +17,7 @@ main = do
     startApp App {
       initialAction = NoOp
     , model = initialModel
-    , update = updateModel
+    , update = updateModel ref
     , view = viewModel
     , subs = []
     , events = defaultEvents
@@ -44,18 +44,18 @@ data Action =
     | PushUser
     | RemoveUser UserKey
 
-updateModel :: Action -> Model -> Effect Action Model
-updateModel NoOp model = noEff model
-updateModel (SetNewName name) model = noEff model { newName = name }
-updateModel (SetNewEmail email) model = noEff model { newEmail = email }
-updateModel PushUser model =
-    let user = ("", User (newName model) (newEmail model))
-    in noEff model {
-          users = users model ++ [user]
-        , newName = ""
-        , newEmail = ""
-        }
-updateModel (RemoveUser key) model =
+updateModel :: DBRef -> Action -> Model -> Effect Action Model
+updateModel _ NoOp model = noEff model
+updateModel _ (SetNewName name) model = noEff model { newName = name }
+updateModel _ (SetNewEmail email) model = noEff model { newEmail = email }
+updateModel ref PushUser model = newModel <# do
+    key <- pushUser ref user
+    putStrLn $ "Pushed: " ++ show key
+    pure NoOp
+    where
+        newModel = model { newName = "", newEmail = "" }
+        user = User (newName model) (newEmail model)
+updateModel _ (RemoveUser key) model =
     noEff model { users = filter ((/= key) . fst) (users model) }
 
 viewModel :: Model -> View Action
