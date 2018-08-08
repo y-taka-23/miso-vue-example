@@ -13,11 +13,10 @@ import           RealtimeDB      (DBRef, User (..), UserKey, getUsersRef,
 main :: IO ()
 main = do
     initializeFirebase
-    ref <- getUsersRef
     startApp App {
       initialAction = NoOp
     , model = initialModel
-    , update = updateModel ref
+    , update = updateModel
     , view = viewModel
     , subs = []
     , events = defaultEvents
@@ -44,18 +43,18 @@ data Action =
     | PushUser
     | RemoveUser UserKey
 
-updateModel :: DBRef -> Action -> Model -> Effect Action Model
-updateModel _ NoOp model = noEff model
-updateModel _ (SetNewName name) model = noEff model { newName = name }
-updateModel _ (SetNewEmail email) model = noEff model { newEmail = email }
-updateModel ref PushUser model = newModel <# do
-    key <- pushUser ref user
+updateModel :: Action -> Model -> Effect Action Model
+updateModel NoOp model = noEff model
+updateModel (SetNewName name) model = noEff model { newName = name }
+updateModel (SetNewEmail email) model = noEff model { newEmail = email }
+updateModel PushUser model = newModel <# do
+    key <- pushUser user
     putStrLn $ "Pushed: " ++ show key
     pure NoOp
     where
         newModel = model { newName = "", newEmail = "" }
         user = User (newName model) (newEmail model)
-updateModel _ (RemoveUser key) model =
+updateModel (RemoveUser key) model =
     noEff model { users = filter ((/= key) . fst) (users model) }
 
 viewModel :: Model -> View Action

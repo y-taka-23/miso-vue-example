@@ -2,7 +2,6 @@
 
 module RealtimeDB (
       initializeFirebase
-    , getUsersRef
     , pushUser
     , DBRef
     , User(..)
@@ -47,13 +46,14 @@ instance ToJSVal User
 
 type DBRef = JSVal
 
-getUsersRef :: IO DBRef
-getUsersRef = runJSaddle () $ do
-    ref <- jsg "firebase" ^. js0 "database" ^. js1 "ref" (val "/users")
+getDBRef :: String -> JSM DBRef
+getDBRef path = do
+    ref <- jsg "firebase" ^. js0 "database" ^. js1 "ref" (val path)
     return ref
 
-pushUser :: DBRef -> User -> IO UserKey
-pushUser ref user = runJSaddle () $ do
+pushUser :: User -> IO UserKey
+pushUser user = runJSaddle () $ do
+    ref <- getDBRef "/users"
     res <- ref ^. js1 "push" (val user)
     key <- valToText =<< res ^. js "key"
     return key
