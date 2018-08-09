@@ -3,7 +3,7 @@
 module RealtimeDB (
       initializeFirebase
     , pushUser
-    , DBRef
+    , removeUser
     , User(..)
     , UserKey
     ) where
@@ -12,7 +12,7 @@ import           Control.Lens                ((^.))
 import qualified Data.Text                   as T
 import           GHC.Generics                (Generic)
 import           GHCJS.Types                 (JSVal)
-import           Language.Javascript.JSaddle (ToJSVal, js, js0, js1, jsg,
+import           Language.Javascript.JSaddle (JSM, ToJSVal, js, js0, js1, jsg,
                                               runJSaddle, val, valToText)
 
 data FirebaseConfig = FirebaseConfig {
@@ -57,3 +57,10 @@ pushUser user = runJSaddle () $ do
     res <- ref ^. js1 "push" (val user)
     key <- valToText =<< res ^. js "key"
     return key
+
+-- Todo: set callback in case of errors
+removeUser :: UserKey -> IO ()
+removeUser key = runJSaddle () $ do
+    ref <- getDBRef $ "/users/" ++ T.unpack key
+    _ <- ref ^. js0 "remove"
+    return ()

@@ -7,8 +7,8 @@ import           Data.List       (intersperse)
 import           Data.List.Split (splitOn)
 import           Miso
 import           Miso.String     (fromMisoString, ms)
-import           RealtimeDB      (DBRef, User (..), UserKey, getUsersRef,
-                                  initializeFirebase, pushUser)
+import           RealtimeDB      (User (..), UserKey, initializeFirebase,
+                                  pushUser, removeUser)
 
 main :: IO ()
 main = do
@@ -54,8 +54,10 @@ updateModel PushUser model = newModel <# do
     where
         newModel = model { newName = "", newEmail = "" }
         user = User (newName model) (newEmail model)
-updateModel (RemoveUser key) model =
-    noEff model { users = filter ((/= key) . fst) (users model) }
+updateModel (RemoveUser key) model = model <# do
+    removeUser key
+    putStrLn $ "Removed: " ++ show key
+    pure NoOp
 
 viewModel :: Model -> View Action
 viewModel model = div_ [ id_ "app" ] [
