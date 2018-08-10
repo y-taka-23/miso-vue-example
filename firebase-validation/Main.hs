@@ -5,10 +5,11 @@ module Main where
 import           Data.Char       (isSpace)
 import           Data.List       (intersperse)
 import           Data.List.Split (splitOn)
+import qualified Data.Map        as M
 import           Miso
 import           Miso.String     (fromMisoString, ms)
 import           RealtimeDB      (User (..), UserKey, initializeFirebase,
-                                  pushUser, removeUser)
+                                  pushUser, removeUser, usersSub)
 
 main :: IO ()
 main = do
@@ -18,20 +19,20 @@ main = do
     , model = initialModel
     , update = updateModel
     , view = viewModel
-    , subs = []
+    , subs = [ usersSub FetchUsers ]
     , events = defaultEvents
     , mountPoint = Nothing
     }
 
 data Model = Model {
-      users    :: [(UserKey, User)]
+      users    :: M.Map UserKey User
     , newName  :: String
     , newEmail :: String
     } deriving (Eq, Show)
 
 initialModel :: Model
 initialModel = Model {
-      users = []
+      users = M.empty
     , newName = ""
     , newEmail = ""
     }
@@ -42,6 +43,7 @@ data Action =
     | SetNewEmail String
     | PushUser
     | RemoveUser UserKey
+    | FetchUsers (M.Map UserKey User)
 
 updateModel :: Action -> Model -> Effect Action Model
 updateModel NoOp model = noEff model
@@ -58,10 +60,11 @@ updateModel (RemoveUser key) model = model <# do
     removeUser key
     putStrLn $ "Removed: " ++ show key
     pure NoOp
+updateModel (FetchUsers us) model = noEff model { users = us }
 
 viewModel :: Model -> View Action
 viewModel model = div_ [ id_ "app" ] [
-      ul_ [] $ map viewUser (users model)
+      ul_ [] $ map viewUser $ M.toAscList (users model)
     , div_ [ id_ "form" ] $ intersperse (text " ") [
           input_ [
               type_ "text"
