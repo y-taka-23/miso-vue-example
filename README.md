@@ -7,3 +7,4 @@ GHCJS + Miso port of [the Vue.js examples](https://vuejs.org/v2/examples/).
 * [Grid Component](https://y-taka-23.github.io/miso-vue-example/grid-component/)
 * [SVG Graph](https://y-taka-23.github.io/miso-vue-example/svg-graph/)
 * [Modal Component](https://y-taka-23.github.io/miso-vue-example/modal-component/)
+* [Firebase + Validation](https://y-taka-23.github.io/miso-vue-example/firebase-validation/)
