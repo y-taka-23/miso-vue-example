@@ -80,6 +80,9 @@ usersSub act = \sink -> do
     _ <- ref ^. js2 "on" (val "value") (fun $ \_ _ [snapshot] -> do
         json <- valToJSON =<< snapshot ^. js0 "val"
         case (decode . encodeUtf8 . lazyTextFromJSString) json of
-            Nothing -> liftIO (putStrLn $ "Parse failed: " ++ show json)
+            Nothing -> liftIO $ do
+                -- if there is no user, Firebase returns null
+                putStrLn $ "Parse failed: " ++ show json
+                sink $ act M.empty
             Just us -> liftIO (sink $ act us))
     return ()
