@@ -1,0 +1,18 @@
+{
+  "rules": {
+    "users": {
+      ".read": true,
+      ".write": true,
+      "$user_key": {
+        ".validate": "newData.hasChildren(['name', 'email'])",
+        "name": {
+          ".validate": "newData.isString() && newData.val().length <= 30"
+        },
+        "email" : {
+          ".validate": "newData.isString() && newData.val().length <= 30"
+        },
+        "$other" : { ".validate": false }
+      }
+    }
+  }
+}
