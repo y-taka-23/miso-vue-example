@@ -50,6 +50,7 @@ viewModel :: Model -> View Action
 viewModel model = div_ [ id_ "app" ] [
       div_ [
           class_ "draggable-header-view"
+        -- Todo: onMouseLeave event doen't fire
         , onMouseDown StartDrag
         , onMouseUp   StopDrag
         ] [
