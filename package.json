@@ -11,7 +11,6 @@
   },
   "devDependencies": {
     "css-loader": "^1.0.0",
-    "dynamics.js": "^1.1.5",
     "file-loader": "^1.1.11",
     "ghcjs-loader": "file:../ghcjs-commonjs/ghcjs-loader",
     "ghcjs-require": "file:../ghcjs-commonjs/ghcjs-require",
