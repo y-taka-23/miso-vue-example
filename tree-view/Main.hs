@@ -63,14 +63,17 @@ updateItem :: Action -> Item -> Item
 updateItem (Here op) item     = operateItem op item
 updateItem (Where n act) item = updateChild n act item
 
+newFile :: Item
+newFile = File "new stuff"
+
 operateItem :: Operation -> Item -> Item
-operateItem Toggle file@(File _) = file
-operateItem Toggle (Folder name open children) = Folder name (not open) children
-operateItem ChangeType (File name) = Folder name True [ File "new stuff" ]
-operateItem ChangeType folder@(Folder _ _ _) = folder
-operateItem AddChild file@(File _) = file
+operateItem Toggle (Folder name open children) =
+    Folder name (not open) children
+operateItem ChangeType (File name) =
+    Folder name True [ newFile ]
 operateItem AddChild (Folder name open children) =
-    Folder name open $ children ++ [ File "new stuff" ]
+    Folder name open $ children ++ [ newFile ]
+operateItem _ item = item
 
 updateChild :: Int -> Action -> Item -> Item
 updateChild n act file@(File _) = file
