@@ -21,7 +21,7 @@ main = do
     , view = viewModel
     , subs = []
     , events = defaultEvents
-    , mountPoint = Nothing
+    , mountPoint = Just "main"
     }
 
 data Model = Model {
@@ -83,14 +83,12 @@ updateModel (DeleteStat sid) model@(Model ss _ _) =
             pure NoOp
 
 viewModel :: Model -> View Action
-viewModel model = div_ [] [
-      div_ [ id_ "demo" ] $
-           [ graphField $ stats model ]
-        ++ (map statSlider $ stats model)
-        ++ [ addForm ]
-        ++ [ rawField $ stats model ]
-    , footnote
-    ]
+viewModel model = div_ [ id_ "demo" ] $
+       [ graphField $ stats model ]
+    ++ (map statSlider $ stats model)
+    ++ [ addForm ]
+    ++ [ rawField $ stats model ]
+    ++ [ footnote ]
 
 graphField :: [Stat] -> View Action
 graphField ss =
