@@ -21,7 +21,7 @@ main = do
     , view = viewModel
     , subs = [ usersSub FetchUsers ]
     , events = defaultEvents
-    , mountPoint = Nothing
+    , mountPoint = Just "main"
     }
 
 data Model = Model {
