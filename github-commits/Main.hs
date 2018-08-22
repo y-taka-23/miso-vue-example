@@ -18,7 +18,7 @@ main = do
     , view = viewModel
     , subs = []
     , events = defaultEvents
-    , mountPoint = Nothing
+    , mountPoint = Just "main"
     }
 
 type Branch = String
